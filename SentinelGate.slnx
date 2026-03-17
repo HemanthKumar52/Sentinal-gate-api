@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SentinelGate.Analytics.Service/SentinelGate.Analytics.Service.csproj" />
+    <Project Path="src/SentinelGate.Dashboard.API/SentinelGate.Dashboard.API.csproj" />
+    <Project Path="src/SentinelGate.Gateway.API/SentinelGate.Gateway.API.csproj" />
+    <Project Path="src/SentinelGate.Identity.Service/SentinelGate.Identity.Service.csproj" />
+    <Project Path="src/SentinelGate.Notification.Service/SentinelGate.Notification.Service.csproj" />
+    <Project Path="src/SentinelGate.RateLimiter.Service/SentinelGate.RateLimiter.Service.csproj" />
+    <Project Path="src/SentinelGate.Shared.Infrastructure/SentinelGate.Shared.Infrastructure.csproj" />
+    <Project Path="src/SentinelGate.Shared.Models/SentinelGate.Shared.Models.csproj" />
+    <Project Path="src/SentinelGate.ThreatDetection.Service/SentinelGate.ThreatDetection.Service.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SentinelGate.Tests/SentinelGate.Tests.csproj" />
+  </Folder>
+</Solution>

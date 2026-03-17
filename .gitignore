@@ -1,0 +1,83 @@
+## .NET Build Outputs
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+artifacts/
+publish/
+out/
+
+## .NET Specific
+*.user
+*.userosscache
+*.suo
+*.cache
+*.nupkg
+*.snupkg
+*.trx
+*.coverage
+*.coveragexml
+*.rsuser
+*.sln.docstates
+project.lock.json
+project.fragment.lock.json
+
+## NuGet
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+## Visual Studio
+.vs/
+*.sln.iml
+*.csproj.user
+launchSettings.json
+
+## JetBrains Rider
+.idea/
+*.sln.iml
+
+## VS Code
+.vscode/
+
+## Test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+TestResult.xml
+
+## Docker
+docker-compose.override.yml
+
+## Environment & Secrets
+.env
+*.env.local
+*.env.*.local
+appsettings.*.local.json
+appsettings.Local.json
+
+## OS Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+## Logs
+[Ll]og/
+[Ll]ogs/
+*.log
+
+## Temp Files
+*.swp
+*.swo
+*~
+*.tmp
+
+## Claude
+CLAUDE.md
+.claude/
+.claude.json

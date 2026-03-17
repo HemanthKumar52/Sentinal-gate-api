@@ -1,0 +1,198 @@
+version: '3.8'
+
+services:
+  # ── Infrastructure ──────────────────────────────────────────────────────────
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: sentinelgate-postgres
+    environment:
+      POSTGRES_USER: sentinelgate
+      POSTGRES_PASSWORD: sentinelgate
+      POSTGRES_DB: sentinelgate_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sentinelgate -d sentinelgate_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sentinelgate
+
+  redis:
+    image: redis:7-alpine
+    container_name: sentinelgate-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sentinelgate
+
+  # ── Application Services ────────────────────────────────────────────────────
+
+  gateway-api:
+    build:
+      context: .
+      dockerfile: src/SentinelGate.Gateway.API/Dockerfile
+    container_name: sentinelgate-gateway
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5000
+      USE_INMEMORY: "false"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=sentinelgate_db;Username=sentinelgate;Password=sentinelgate"
+      SentinelGate__Redis__ConnectionString: "redis:6379"
+      ServiceUrls__ThreatDetection: "http://threatdetection-service:5003"
+      ServiceUrls__Analytics: "http://analytics-service:5002"
+      ServiceUrls__Notification: "http://notification-service:5004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sentinelgate
+
+  ratelimiter-service:
+    build:
+      context: .
+      dockerfile: src/SentinelGate.RateLimiter.Service/Dockerfile
+    container_name: sentinelgate-ratelimiter
+    ports:
+      - "5001:5001"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5001
+      USE_INMEMORY: "false"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=sentinelgate_db;Username=sentinelgate;Password=sentinelgate"
+      SentinelGate__Redis__ConnectionString: "redis:6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sentinelgate
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: src/SentinelGate.Analytics.Service/Dockerfile
+    container_name: sentinelgate-analytics
+    ports:
+      - "5002:5002"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5002
+      USE_INMEMORY: "false"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=sentinelgate_db;Username=sentinelgate;Password=sentinelgate"
+      SentinelGate__Redis__ConnectionString: "redis:6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sentinelgate
+
+  threatdetection-service:
+    build:
+      context: .
+      dockerfile: src/SentinelGate.ThreatDetection.Service/Dockerfile
+    container_name: sentinelgate-threatdetection
+    ports:
+      - "5003:5003"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5003
+      USE_INMEMORY: "false"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=sentinelgate_db;Username=sentinelgate;Password=sentinelgate"
+      SentinelGate__Redis__ConnectionString: "redis:6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sentinelgate
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: src/SentinelGate.Notification.Service/Dockerfile
+    container_name: sentinelgate-notification
+    ports:
+      - "5004:5004"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5004
+      USE_INMEMORY: "false"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=sentinelgate_db;Username=sentinelgate;Password=sentinelgate"
+      SentinelGate__Redis__ConnectionString: "redis:6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sentinelgate
+
+  identity-service:
+    build:
+      context: .
+      dockerfile: src/SentinelGate.Identity.Service/Dockerfile
+    container_name: sentinelgate-identity
+    ports:
+      - "5005:5005"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5005
+      USE_INMEMORY: "false"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=sentinelgate_db;Username=sentinelgate;Password=sentinelgate"
+      SentinelGate__Redis__ConnectionString: "redis:6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sentinelgate
+
+  dashboard-api:
+    build:
+      context: .
+      dockerfile: src/SentinelGate.Dashboard.API/Dockerfile
+    container_name: sentinelgate-dashboard
+    ports:
+      - "5006:5006"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5006
+      USE_INMEMORY: "false"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=sentinelgate_db;Username=sentinelgate;Password=sentinelgate"
+      SentinelGate__Redis__ConnectionString: "redis:6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sentinelgate
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  sentinelgate:
+    driver: bridge
